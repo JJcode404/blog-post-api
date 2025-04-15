@@ -1,10 +1,1 @@
-A simple and efficient file upload system that allows users to upload, store, and manage files securely. Features include drag-and-drop support, progress tracking, file validation, and cloud/local storage options. Built with a user-friendly interface for seamless file handling.
-
-Key Features:
-✔ Multiple file uploads
-✔ Real-time progress indicators
-✔ File type & size validation
-✔ Secure storage & retrieval
-✔ Responsive design
-
-Perfect for websites, apps, or internal tools requiring file management!
+The Blog Post API is a RESTful interface designed to manage blog content efficiently. It allows users to perform standard CRUD (Create, Read, Update, Delete) operations on blog posts. Each post includes fields such as title, body, author, tags, and publishedDate. The API also supports features like pagination, filtering by tags or author, and search functionality.
