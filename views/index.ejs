@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/index.css" />
+    <link rel="icon" href="/images/cloud.svg" type="image/svg+xml" />
+    <title>File Uploader - My Drive</title>
+  </head>
+  <body>
+    <img
+      src="/images/panel-left-close.svg"
+      alt="toggle side bar"
+      class="menu-toggle"
+      onclick="toggleSidebar()"
+    />
+    <div class="container">
+      <%- include('sidebar')%>
+      <main class="main">
+        <%- include('welcome.ejs')%>
+        <h1>Dashboard</h1>
+        <div class="cards">
+          <div class="card">
+            <h2>Total Files</h2>
+            <p><%= totalFiles%> files uploaded</p>
+          </div>
+          <div class="card">
+            <h2>Total Folders</h2>
+            <p><%= totalFolders%> folders uploaded</p>
+          </div>
+          <div class="card">
+            <h2>Storage Used</h2>
+            <p id="space-used">Computing...</p>
+          </div>
+        </div>
+        <a href="/upload-file"
+          ><button class="upload-btn">Upload New File</button></a
+        >
+        <a href="/upload-folder"
+          ><button class="upload-btn">Upload New Folder</button></a
+        >
+      </main>
+    </div>
+    <script>
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("hidden");
+      }
+      function addActiveIndicator(element) {
+        const elementDiv = document.querySelector(`.${element}`);
+        console.log(elementDiv);
+        if (elementDiv) {
+          elementDiv.classList.add("active");
+        }
+      }
+
+      addActiveIndicator("dashboard");
+
+      fetch("/api/space-used")
+        .then((res) => res.json())
+        .then((data) => {
+          const space = data.spaceUsed;
+          const formatted = (space / (1024 * 1024 * 1024)).toFixed(2); // in GB
+          console.log(formatted);
+          if (!space) {
+            document.getElementById("space-used").innerText = "Failed to load";
+          } else {
+            document.getElementById(
+              "space-used"
+            ).innerText = `${formatted} GB of 25 GB`;
+          }
+        })
+        .catch((error) => {
+          document.getElementById("space-used").innerText = "Failed to load";
+        });
+    </script>
+  </body>
+</html>
