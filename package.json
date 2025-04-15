@@ -1,11 +1,11 @@
 {
-  "name": "mini-message-board",
+  "name": "blog-post-api",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "start": "node main.js",
+    "start": "node --watch main.js",
     "postinstall": "prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
