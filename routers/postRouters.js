@@ -13,13 +13,14 @@ import {
   updateComment,
   deleteComment,
 } from "../controllers/commentsController.js";
+import { verifyToken } from "../controllers/verifyJwt.js";
 const postRouter = Router();
 
 postRouter.post("/", createPost);
 postRouter.get("/", getAllposts);
 postRouter.get("/:postid", getPost);
 postRouter.put("/:postid", updatePost);
-postRouter.delete("/:postid", deletePost);
+postRouter.delete("/:postid", verifyToken, deletePost);
 
 //comments routes
 postRouter.post("/:postid/comments", createPostComment);
