@@ -16,17 +16,17 @@ import {
 import { verifyToken } from "../controllers/verifyJwt.js";
 const postRouter = Router();
 
-postRouter.post("/", createPost);
+postRouter.post("/", verifyToken, createPost);
 postRouter.get("/", getAllposts);
 postRouter.get("/:postid", getPost);
-postRouter.put("/:postid", updatePost);
+postRouter.put("/:postid", verifyToken, updatePost);
 postRouter.delete("/:postid", verifyToken, deletePost);
 
 //comments routes
-postRouter.post("/:postid/comments", createPostComment);
+postRouter.post("/:postid/comments", verifyToken, createPostComment);
 postRouter.get("/:postid/comments", getPostAllComments);
 postRouter.get("/:postid/comments/:commentid", getComment);
-postRouter.put("/:postid/comments/:commentid", updateComment);
-postRouter.delete("/:postid/comments/:commentid", deleteComment);
+postRouter.put("/:postid/comments/:commentid", verifyToken, updateComment);
+postRouter.delete("/:postid/comments/:commentid", verifyToken, deleteComment);
 
 export { postRouter };

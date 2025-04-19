@@ -12,20 +12,21 @@ import {
   deleteUserProfile,
   createUserProfile,
 } from "../controllers/userProfileController.js";
+import { verifyToken } from "../controllers/verifyJwt.js";
 
 const userRouter = Router();
 
-userRouter.post("/", createUser);
+userRouter.post("/", verifyToken, createUser);
 userRouter.get("/", getAllUsers);
 userRouter.get("/:userid", getUser);
-userRouter.put("/:userid", updateUser);
-userRouter.delete("/:userid", deleteUser);
+userRouter.put("/:userid", verifyToken, updateUser);
+userRouter.delete("/:userid", verifyToken, deleteUser);
 
 //profile routes
 
-userRouter.post("/:userid/profile", createUserProfile);
+userRouter.post("/:userid/profile", verifyToken, createUserProfile);
 userRouter.get("/:userid/profile", getUserProfile);
-userRouter.put("/:userid/profile", updateUserProfile);
-userRouter.delete("/:userid/profile", deleteUserProfile);
+userRouter.put("/:userid/profile", verifyToken, updateUserProfile);
+userRouter.delete("/:userid/profile", verifyToken, deleteUserProfile);
 
 export { userRouter };
