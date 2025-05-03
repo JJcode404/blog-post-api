@@ -1,5 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import cors from "cors";
 import express from "express";
 import { Strategy as LocalStrategy } from "passport-local";
 import passport from "passport";
@@ -17,6 +18,7 @@ const __dirname = path.dirname(__filename);
 const assetsPath = path.join(__dirname, "public");
 
 const app = express();
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(assetsPath));
 app.use(express.json());

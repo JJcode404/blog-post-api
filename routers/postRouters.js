@@ -5,6 +5,7 @@ import {
   getPost,
   updatePost,
   deletePost,
+  getLatestPost,
 } from "../controllers/postsController.js";
 import {
   getPostAllComments,
@@ -18,6 +19,7 @@ const postRouter = Router();
 
 postRouter.post("/", verifyToken, createPost);
 postRouter.get("/", getAllposts);
+postRouter.get("/latest", getLatestPost);
 postRouter.get("/:postid", getPost);
 postRouter.put("/:postid", verifyToken, updatePost);
 postRouter.delete("/:postid", verifyToken, deletePost);

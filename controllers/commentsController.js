@@ -59,11 +59,14 @@ const getPostAllComments = async (req, res, next) => {
 
     const comments = await prisma.comment.findMany({
       where: { postId: postid },
+      include: {
+        user: true,
+      },
       orderBy: { createdAt: "desc" },
     });
-    if (!comments.length) {
-      return next(new AppError("No comments found for this post", 404));
-    }
+    // if (!comments.length) {
+    //   return next(new AppError("No comments found for this post", 404));
+    // }
 
     res.json(comments);
   } catch (error) {

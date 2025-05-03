@@ -35,6 +35,22 @@ const getAllposts = async (req, res, next) => {
     next(new AppError(error.message, 500));
   }
 };
+const getLatestPost = async (req, res, next) => {
+  try {
+    const first3latestPost = await prisma.post.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        author: true,
+      },
+      take: 3,
+    });
+    res.json(first3latestPost);
+  } catch (error) {
+    next(new AppError(error.message), 500);
+  }
+};
 
 // Get a specific post by ID
 const getPost = async (req, res, next) => {
@@ -94,4 +110,11 @@ const deletePost = async (req, res, next) => {
   }
 };
 
-export { createPost, deletePost, getAllposts, getPost, updatePost };
+export {
+  createPost,
+  deletePost,
+  getAllposts,
+  getPost,
+  updatePost,
+  getLatestPost,
+};
