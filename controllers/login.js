@@ -2,6 +2,7 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 
 const authenticateUser = (req, res, next) => {
+  console.log(req.body);
   passport.authenticate("local", (err, user, info) => {
     if (err) {
       console.error("Authentication error:", err);
