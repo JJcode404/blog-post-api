@@ -49,6 +49,21 @@ const getUser = async (req, res, next) => {
     next(new AppError(error.message, 500));
   }
 };
+const getAuthorData = async (req, res, next) => {
+  try {
+    const { userid } = req.params;
+    const authorData = await prisma.user.findFirst({
+      where: { id: userid },
+      include: { profile: true, posts: true, comments: true },
+    });
+    if (!authorData) {
+      next(new AppError("author data not found", 400));
+    }
+    res.json(authorData);
+  } catch (error) {
+    next(new AppError(error.message, 500));
+  }
+};
 
 const updateUser = async (req, res, next) => {
   try {
@@ -80,4 +95,11 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-export { createUser, deleteUser, updateUser, getUser, getAllUsers };
+export {
+  createUser,
+  deleteUser,
+  updateUser,
+  getUser,
+  getAllUsers,
+  getAuthorData,
+};

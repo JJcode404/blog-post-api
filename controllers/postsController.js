@@ -1,23 +1,68 @@
 import { prisma } from "../prismaClient.js";
 import { AppError } from "../utils/AppError.js";
+import { cloudinary } from "../cloudinary.js";
+import fs from "fs";
+import path from "path";
 
-const createPost = async (req, res, next) => {
+const createPost = async (req, res) => {
+  let localPath;
+  console.log("req.body:", req.body);
+  console.log("file", req.file);
+  // console.log("typeof tags:", typeof req.body.tags);
+
   try {
-    const { title, content, thumbnail, published, authorId } = req.body;
+    const { title, content, tags, authorId, published } = req.body;
 
-    const post = await prisma.post.create({
+    let imageUrl = "";
+
+    // Handle thumbnail upload
+    if (req.file) {
+      localPath = req.file.path;
+
+      // 1. Upload to Cloudinary
+      try {
+        const result = await cloudinary.uploader.upload(localPath, {
+          folder: "myapp_files",
+          timeout: 26000,
+        });
+        console.log("☁️ Cloudinary URL:", result.secure_url);
+        imageUrl = result.secure_url;
+        fs.unlinkSync(localPath);
+      } catch (uploadError) {
+        console.error("Cloudinary upload failed:", uploadError);
+      }
+    }
+    const parsedTags = JSON.parse(tags);
+
+    const newPost = await prisma.post.create({
       data: {
         title,
         content,
-        thumbnail,
-        published,
-        author: { connect: { id: authorId } },
+        thumbnail: imageUrl,
+        published: published === "true",
+        author: {
+          connect: { id: authorId },
+        },
+        tags: {
+          connectOrCreate: parsedTags.map((tag) => ({
+            where: { name: tag },
+            create: { name: tag },
+          })),
+        },
       },
     });
 
-    res.status(201).json(post);
+    res.status(201).json({
+      id: newPost.id,
+      title: newPost.title,
+      published: newPost.published,
+    });
   } catch (error) {
-    next(new AppError(error.message, 400));
+    if (localPath && fs.existsSync(localPath)) {
+      fs.unlinkSync(localPath);
+    }
+    console.error("Error creating post:", error);
+    res.status(500).json({ message: "Failed to create post" });
   }
 };
 
@@ -74,6 +119,29 @@ const getPost = async (req, res, next) => {
     next(new AppError(error.message), 500);
   }
 };
+const getPostsByuserId = async (req, res, next) => {
+  try {
+    const { userid } = req.params;
+
+    const post = await prisma.post.findMany({
+      where: { authorId: userid },
+      select: {
+        title: true,
+        published: true,
+        id: true,
+      },
+    });
+    console.log(post);
+
+    if (!post) {
+      return next(new AppError("Post not found.", 404));
+    }
+
+    res.json(post);
+  } catch (error) {
+    next(new AppError(error.message), 500);
+  }
+};
 
 const updatePost = async (req, res, next) => {
   try {
@@ -117,4 +185,5 @@ export {
   getPost,
   updatePost,
   getLatestPost,
+  getPostsByuserId,
 };

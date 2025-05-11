@@ -20,15 +20,21 @@ const createComment = async (req, res, next) => {
 const createPostComment = async (req, res, next) => {
   try {
     const { postid } = req.params;
-    const { content, userId, username, email } = req.body;
+    const { content, userId } = req.body;
 
     const comment = await prisma.comment.create({
       data: {
         content,
         post: { connect: { id: postid } },
-        userId,
-        username,
-        email,
+        user: { connect: { id: userId } },
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
@@ -50,6 +56,67 @@ const getAllComments = async (req, res, next) => {
     res.json(comments);
   } catch (error) {
     next(new AppError("Something went wrong while fetching comments", 500));
+  }
+};
+const getCommentsByUserId = async (req, res, next) => {
+  const { authorId } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page - 1) * limit;
+
+  try {
+    // Count total comments for pagination metadata
+    const totalCount = await prisma.comment.count({
+      where: {
+        userId: authorId,
+      },
+    });
+
+    const userComments = await prisma.comment.findMany({
+      where: {
+        userId: authorId,
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+        post: {
+          select: {
+            title: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take: limit,
+    });
+
+    if (!userComments.length) {
+      return next(new AppError("No comments found for this user", 404));
+    }
+
+    res.json({
+      comments: userComments.map((comment) => ({
+        content: comment.content,
+        createdAt: comment.createdAt,
+        authorName: comment.user.name,
+        postTitle: comment.post.title,
+      })),
+      totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+    });
+  } catch (error) {
+    next(
+      new AppError(
+        "Something went wrong while retrieving comments by user ID",
+        500
+      )
+    );
   }
 };
 
@@ -127,6 +194,7 @@ export {
   updateComment,
   createPostComment,
   getPostAllComments,
+  getCommentsByUserId,
   getAllComments,
   getComment,
   deleteComment,

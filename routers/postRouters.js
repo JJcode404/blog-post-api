@@ -15,9 +15,24 @@ import {
   deleteComment,
 } from "../controllers/commentsController.js";
 import { verifyToken } from "../controllers/verifyJwt.js";
+
+import multer from "multer";
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
+  },
+});
+
+const upload = multer({ storage });
+
 const postRouter = Router();
 
-postRouter.post("/", verifyToken, createPost);
+postRouter.post("/", upload.single("thumbnail"), createPost);
 postRouter.get("/", getAllposts);
 postRouter.get("/latest", getLatestPost);
 postRouter.get("/:postid", getPost);

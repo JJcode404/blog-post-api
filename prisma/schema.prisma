@@ -40,6 +40,7 @@ model Post {
   content   String
   thumbnail String?
   published Boolean   @default(false)
+  tags      Tag[]     @relation("PostTags")
   author    User      @relation("AuthorPosts", fields: [authorId], references: [id])
   authorId  String
   comments  Comment[]
@@ -58,6 +59,12 @@ model Comment {
   email     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Tag {
+  id    String @id @default(uuid())
+  name  String @unique
+  posts Post[] @relation("PostTags")
 }
 
 enum Role {
