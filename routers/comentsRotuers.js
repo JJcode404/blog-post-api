@@ -14,7 +14,7 @@ commentRouter.post("/", verifyToken, createComment);
 commentRouter.get("/", getAllComments);
 commentRouter.get("/:commentid", getComment);
 commentRouter.get("/user/:userid", getCommentsByUserId);
-commentRouter.put("/:commentid", verifyToken, updateComment);
-commentRouter.delete("/:commentid", verifyToken, deleteComment);
+commentRouter.put("/:commentid", updateComment);
+commentRouter.delete("/:commentid", deleteComment);
 
 export { commentRouter };

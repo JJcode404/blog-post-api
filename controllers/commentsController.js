@@ -103,6 +103,7 @@ const getCommentsByUserId = async (req, res, next) => {
       comments: userComments.map((comment) => ({
         content: comment.content,
         createdAt: comment.createdAt,
+        id: comment.id,
         authorName: comment.user.name,
         postTitle: comment.post.title,
       })),
@@ -179,11 +180,11 @@ const deleteComment = async (req, res, next) => {
   try {
     const { commentid } = req.params;
 
-    await prisma.comment.delete({
+    const commentDeleted = await prisma.comment.delete({
       where: { id: commentid },
     });
 
-    res.status(204).send();
+    res.json(commentDeleted);
   } catch (error) {
     next(new AppError(error.message, 500));
   }

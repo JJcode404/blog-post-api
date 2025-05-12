@@ -6,6 +6,7 @@ import {
   updatePost,
   deletePost,
   getLatestPost,
+  updatePublishState,
 } from "../controllers/postsController.js";
 import {
   getPostAllComments,
@@ -15,7 +16,6 @@ import {
   deleteComment,
 } from "../controllers/commentsController.js";
 import { verifyToken } from "../controllers/verifyJwt.js";
-
 import multer from "multer";
 
 const storage = multer.diskStorage({
@@ -37,7 +37,7 @@ postRouter.get("/", getAllposts);
 postRouter.get("/latest", getLatestPost);
 postRouter.get("/:postid", getPost);
 postRouter.put("/:postid", verifyToken, updatePost);
-postRouter.delete("/:postid", verifyToken, deletePost);
+postRouter.delete("/:postid", deletePost);
 
 //comments routes
 postRouter.post("/:postid/comments", verifyToken, createPostComment);
@@ -45,5 +45,7 @@ postRouter.get("/:postid/comments", getPostAllComments);
 postRouter.get("/:postid/comments/:commentid", getComment);
 postRouter.put("/:postid/comments/:commentid", verifyToken, updateComment);
 postRouter.delete("/:postid/comments/:commentid", verifyToken, deleteComment);
+//update pushlish state
+postRouter.put("/:postid/publish", updatePublishState);
 
 export { postRouter };

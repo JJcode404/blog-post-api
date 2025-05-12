@@ -6,8 +6,6 @@ import path from "path";
 
 const createPost = async (req, res) => {
   let localPath;
-  console.log("req.body:", req.body);
-  console.log("file", req.file);
   // console.log("typeof tags:", typeof req.body.tags);
 
   try {
@@ -130,8 +128,10 @@ const getPostsByuserId = async (req, res, next) => {
         published: true,
         id: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
-    console.log(post);
 
     if (!post) {
       return next(new AppError("Post not found.", 404));
@@ -163,16 +163,39 @@ const updatePost = async (req, res, next) => {
     next(new AppError(error.message, 400));
   }
 };
+const updatePublishState = async (req, res, next) => {
+  try {
+    const { postid } = req.params;
+    const { published } = req.body;
+
+    if (typeof published !== "boolean") {
+      return res.status(400).json({ message: "Invalid 'published' value" });
+    }
+
+    const updatedPost = await prisma.post.update({
+      where: { id: postid },
+      data: { published },
+    });
+
+    res.json(updatedPost);
+  } catch (error) {
+    next(new AppError(error.message, 400));
+  }
+};
 
 const deletePost = async (req, res, next) => {
   try {
     const { postid } = req.params;
 
-    await prisma.post.delete({
+    await prisma.comment.deleteMany({
+      where: { postId: postid },
+    });
+
+    const deletePost = await prisma.post.delete({
       where: { id: postid },
     });
 
-    res.status(204).send();
+    res.json(deletePost);
   } catch (error) {
     next(new AppError(error.message, 400));
   }
@@ -186,4 +209,5 @@ export {
   updatePost,
   getLatestPost,
   getPostsByuserId,
+  updatePublishState,
 };
