@@ -4,7 +4,7 @@ import { cloudinary } from "../cloudinary.js";
 import fs from "fs";
 import path from "path";
 
-const createPost = async (req, res) => {
+const createPost = async (req, res, next) => {
   let localPath;
   // console.log("typeof tags:", typeof req.body.tags);
 
@@ -21,13 +21,19 @@ const createPost = async (req, res) => {
       try {
         const result = await cloudinary.uploader.upload(localPath, {
           folder: "myapp_files",
-          timeout: 26000,
+          timeout: 60,
         });
         console.log("☁️ Cloudinary URL:", result.secure_url);
         imageUrl = result.secure_url;
         fs.unlinkSync(localPath);
       } catch (uploadError) {
-        console.error("Cloudinary upload failed:", uploadError);
+        fs.unlinkSync(localPath);
+        return next(
+          new AppError(
+            "Image upload failed. Please check your internet connection or try again later.",
+            503
+          )
+        );
       }
     }
     const parsedTags = JSON.parse(tags);
@@ -59,8 +65,7 @@ const createPost = async (req, res) => {
     if (localPath && fs.existsSync(localPath)) {
       fs.unlinkSync(localPath);
     }
-    console.error("Error creating post:", error);
-    res.status(500).json({ message: "Failed to create post" });
+    next(new AppError("Error creating post", 500));
   }
 };
 
