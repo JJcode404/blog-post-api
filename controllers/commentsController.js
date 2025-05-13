@@ -59,7 +59,8 @@ const getAllComments = async (req, res, next) => {
   }
 };
 const getCommentsByUserId = async (req, res, next) => {
-  const { authorId } = req.params;
+  const { userid } = req.params;
+  const authorId = userid;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
   const skip = (page - 1) * limit;

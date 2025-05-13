@@ -21,13 +21,14 @@ const createPost = async (req, res, next) => {
       try {
         const result = await cloudinary.uploader.upload(localPath, {
           folder: "myapp_files",
-          timeout: 60,
+          timeout: 60000,
         });
         console.log("☁️ Cloudinary URL:", result.secure_url);
         imageUrl = result.secure_url;
         fs.unlinkSync(localPath);
       } catch (uploadError) {
         fs.unlinkSync(localPath);
+        console.log(uploadError);
         return next(
           new AppError(
             "Image upload failed. Please check your internet connection or try again later.",
@@ -72,9 +73,13 @@ const createPost = async (req, res, next) => {
 const getAllposts = async (req, res, next) => {
   try {
     const posts = await prisma.post.findMany({
+      where: {
+        published: true,
+      },
       include: {
         author: true,
         comments: true,
+        tags: true,
       },
     });
 
@@ -86,6 +91,9 @@ const getAllposts = async (req, res, next) => {
 const getLatestPost = async (req, res, next) => {
   try {
     const first3latestPost = await prisma.post.findMany({
+      where: {
+        published: true,
+      },
       orderBy: {
         createdAt: "desc",
       },
@@ -110,6 +118,7 @@ const getPost = async (req, res, next) => {
       include: {
         author: true,
         comments: true,
+        tags: true,
       },
     });
 
