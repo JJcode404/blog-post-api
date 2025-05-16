@@ -12,11 +12,15 @@ const authenticateUser = (req, res, next) => {
     if (!user) {
       next(new AppError(`${info.message}`, 400));
     }
-    const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "20s" });
+    const { password, ...safeUser } = user;
+
+    const token = jwt.sign(safeUser, process.env.JWT_SECRET, {
+      expiresIn: "30m",
+    });
     console.log("JWT:", token);
     res.json({
       Token: token,
-      user: user,
+      user: safeUser,
     });
   })(req, res, next);
 };

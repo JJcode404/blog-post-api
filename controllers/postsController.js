@@ -153,6 +153,7 @@ const getPostsByuserId = async (req, res, next) => {
 
     res.json(post);
   } catch (error) {
+    console.log(error);
     next(new AppError(error.message), 500);
   }
 };

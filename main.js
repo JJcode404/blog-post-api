@@ -11,6 +11,8 @@ import { commentRouter } from "./routers/comentsRotuers.js";
 import { userRouter } from "./routers/usersRotures.js";
 import { loginRouter } from "./routers/loginRouters.js";
 import { signupRouter } from "./routers/signupRouter.js";
+import { authorRouter } from "./routers/authorRouters.js";
+import { verifyToken } from "./controllers/verifyJwt.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +54,7 @@ passport.use(
 app.use("/posts", postRouter);
 app.use("/comments", commentRouter);
 app.use("/users", userRouter);
+app.use("/author", authorRouter);
 app.use("/login", loginRouter);
 app.use("/sign-up", signupRouter);
 
