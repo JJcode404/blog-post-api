@@ -134,6 +134,15 @@ const getPost = async (req, res, next) => {
 const getPostsByuserId = async (req, res, next) => {
   try {
     const { userid } = req.params;
+    console.log(req.user.id == userid);
+    console.log("user id from database", req.user.id);
+    console.log("user id from params", userid);
+
+    if (req.user.id !== userid) {
+      return res.status(403).json({
+        message: "Access denied: You can only access your own comments.",
+      });
+    }
 
     const post = await prisma.post.findMany({
       where: { authorId: userid },
@@ -146,10 +155,6 @@ const getPostsByuserId = async (req, res, next) => {
         createdAt: "desc",
       },
     });
-
-    if (!post) {
-      return next(new AppError("Post not found.", 404));
-    }
 
     res.json(post);
   } catch (error) {

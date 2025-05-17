@@ -96,9 +96,9 @@ const getCommentsByUserId = async (req, res, next) => {
       take: limit,
     });
 
-    if (!userComments.length) {
-      return next(new AppError("No comments found for this user", 404));
-    }
+    // if (!userComments.length) {
+    //   return next(new AppError("No comments found for this user", 404));
+    // }
 
     res.json({
       comments: userComments.map((comment) => ({

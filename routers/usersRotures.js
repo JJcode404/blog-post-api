@@ -22,8 +22,8 @@ const userRouter = Router();
 userRouter.post("/", verifyToken, createUser);
 userRouter.get("/", getAllUsers);
 userRouter.get("/:userid", getUser);
-userRouter.get("/comments/:userid", getCommentsByUserId);
-userRouter.get("/posts/:userid", getPostsByuserId);
+userRouter.get("/comments/:userid", verifyToken, getCommentsByUserId);
+userRouter.get("/posts/:userid", verifyToken, getPostsByuserId);
 userRouter.put("/:userid", verifyToken, updateUser);
 userRouter.delete("/:userid", verifyToken, deleteUser);
 
