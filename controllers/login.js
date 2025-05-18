@@ -10,7 +10,9 @@ const authenticateUser = (req, res, next) => {
       return next(err);
     }
     if (!user) {
-      next(new AppError(`${info.message}`, 400));
+      console.log(info.message);
+      // res.send
+      return next(new AppError(`${info.message}`, 400));
     }
     const { password, ...safeUser } = user;
 
