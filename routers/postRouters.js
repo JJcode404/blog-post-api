@@ -17,6 +17,7 @@ import {
 } from "../controllers/commentsController.js";
 import { verifyToken } from "../controllers/verifyJwt.js";
 import multer from "multer";
+import { validatePost } from "../validators/validateNewpost.js";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -32,7 +33,7 @@ const upload = multer({ storage });
 
 const postRouter = Router();
 
-postRouter.post("/", upload.single("thumbnail"), createPost);
+postRouter.post("/", upload.single("thumbnail"), validatePost, createPost);
 postRouter.get("/", getAllposts);
 postRouter.get("/latest", getLatestPost);
 postRouter.get("/:postid", getPost);

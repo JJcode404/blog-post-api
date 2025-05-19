@@ -66,6 +66,7 @@ const createPost = async (req, res, next) => {
     if (localPath && fs.existsSync(localPath)) {
       fs.unlinkSync(localPath);
     }
+    console.log(error);
     next(new AppError("Error creating post", 500));
   }
 };
