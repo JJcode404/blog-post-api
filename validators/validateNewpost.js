@@ -78,7 +78,10 @@ const validatePost = [
     if (!errors.isEmpty()) {
       const firstError = errors.array()[0];
       console.log(firstError);
-      fs.unlinkSync(req.file.path);
+
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
 
       return next(new AppError(firstError.msg, 400));
     }
