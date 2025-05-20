@@ -19,16 +19,7 @@ import { verifyToken } from "../controllers/verifyJwt.js";
 import multer from "multer";
 import { validatePost } from "../validators/validateNewpost.js";
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueName);
-  },
-});
-
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 const postRouter = Router();

@@ -1,33 +1,34 @@
 import { prisma } from "../prismaClient.js";
 import { AppError } from "../utils/AppError.js";
 import { cloudinary } from "../cloudinary.js";
-import fs from "fs";
-import path from "path";
+import streamifier from "streamifier";
 
 const createPost = async (req, res, next) => {
-  let localPath;
-  // console.log("typeof tags:", typeof req.body.tags);
-
   try {
     const { title, content, tags, authorId, published } = req.body;
 
     let imageUrl = "";
 
-    // Handle thumbnail upload
     if (req.file) {
-      localPath = req.file.path;
-
-      // 1. Upload to Cloudinary
       try {
-        const result = await cloudinary.uploader.upload(localPath, {
-          folder: "myapp_files",
-          timeout: 60000,
+        const result = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              folder: "myapp_files",
+              timeout: 60000,
+            },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+
+          streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
         });
+
         console.log("☁️ Cloudinary URL:", result.secure_url);
         imageUrl = result.secure_url;
-        fs.unlinkSync(localPath);
       } catch (uploadError) {
-        fs.unlinkSync(localPath);
         console.log(uploadError);
         return next(
           new AppError(
@@ -37,6 +38,7 @@ const createPost = async (req, res, next) => {
         );
       }
     }
+
     const parsedTags = JSON.parse(tags);
 
     const newPost = await prisma.post.create({
@@ -63,9 +65,6 @@ const createPost = async (req, res, next) => {
       published: newPost.published,
     });
   } catch (error) {
-    if (localPath && fs.existsSync(localPath)) {
-      fs.unlinkSync(localPath);
-    }
     console.log(error);
     next(new AppError("Error creating post", 500));
   }
