@@ -33,7 +33,7 @@ const upload = multer({ storage });
 
 const postRouter = Router();
 
-postRouter.post("/", upload.single("thumbnail"), validatePost, createPost);
+postRouter.post("/", upload.single("thumbnail"), createPost);
 postRouter.get("/", getAllposts);
 postRouter.get("/latest", getLatestPost);
 postRouter.get("/:postid", getPost);
