@@ -19,6 +19,31 @@ const __dirname = path.dirname(__filename);
 
 const assetsPath = path.join(__dirname, "public");
 
+process.on("uncaughtException", (error) => {
+  console.error("⚠️ UNCAUGHT EXCEPTION ⚠️");
+  console.error(error);
+  console.error(error.stack);
+
+  // Log additional info if it's a file system error
+  if (error.code === "ENOENT") {
+    console.error("File not found error. Path:", error.path);
+    console.error("Occurred in operation:", error.syscall);
+  }
+
+  // Optional: exit the process after logging
+  // process.exit(1);
+});
+
+// Global error handler for unhandled promise rejections
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("⚠️ UNHANDLED PROMISE REJECTION ⚠️");
+  console.error("Reason:", reason);
+  console.error("Promise:", promise);
+
+  // Optional: exit the process after logging
+  // process.exit(1);
+});
+
 const app = express();
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
