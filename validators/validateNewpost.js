@@ -2,17 +2,6 @@ import { body, validationResult } from "express-validator";
 import { AppError } from "../utils/AppError.js";
 import fs from "fs";
 
-// Helper function to safely delete a file
-const safelyDeleteFile = (filePath) => {
-  try {
-    if (filePath && fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-  } catch (error) {
-    console.log("Error deleting file:", error.message);
-  }
-};
-
 // Define validation rules for post creation/updates
 const validatePost = [
   // Title validations
@@ -29,6 +18,8 @@ const validatePost = [
     .withMessage("Content is required")
     .isLength({ min: 10 })
     .withMessage("Content must be at least 10 characters long"),
+
+  // Author ID validation
 
   // Tags validation
   body("tags").custom((value) => {
@@ -65,16 +56,16 @@ const validatePost = [
     // Validate file type
     const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!allowedTypes.includes(req.file.mimetype)) {
-      // Remove the invalid file - using safe delete
-      safelyDeleteFile(req.file.path);
+      // Remove the invalid file
+      fs.unlinkSync(req.file.path);
       throw new Error("Only JPG, PNG, GIF, and WebP images are allowed");
     }
 
     // Validate file size (limit to 5MB)
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (req.file.size > maxSize) {
-      // Remove the invalid file - using safe delete
-      safelyDeleteFile(req.file.path);
+      // Remove the invalid file
+      fs.unlinkSync(req.file.path);
       throw new Error("Image size should not exceed 5MB");
     }
 
@@ -88,9 +79,8 @@ const validatePost = [
       const firstError = errors.array()[0];
       console.log(firstError);
 
-      // Safely delete the file if it exists
-      if (req.file) {
-        safelyDeleteFile(req.file.path);
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
       }
 
       return next(new AppError(firstError.msg, 400));
@@ -100,4 +90,4 @@ const validatePost = [
   },
 ];
 
-export { validatePost, safelyDeleteFile };
+export { validatePost };
