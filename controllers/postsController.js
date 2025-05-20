@@ -3,7 +3,7 @@ import { AppError } from "../utils/AppError.js";
 import { cloudinary } from "../cloudinary.js";
 import fs from "fs";
 import path from "path";
-
+import { safelyDeleteFile } from "../validators/validateNewpost.js";
 const createPost = async (req, res, next) => {
   let localPath;
   // console.log("typeof tags:", typeof req.body.tags);
@@ -25,9 +25,12 @@ const createPost = async (req, res, next) => {
         });
         console.log("☁️ Cloudinary URL:", result.secure_url);
         imageUrl = result.secure_url;
-        fs.unlinkSync(localPath);
+
+        // Safely delete local file after upload
+        safelyDeleteFile(localPath);
       } catch (uploadError) {
-        fs.unlinkSync(localPath);
+        // Safely delete local file if upload fails
+        safelyDeleteFile(localPath);
         console.log(uploadError);
         return next(
           new AppError(
@@ -63,8 +66,9 @@ const createPost = async (req, res, next) => {
       published: newPost.published,
     });
   } catch (error) {
-    if (localPath && fs.existsSync(localPath)) {
-      fs.unlinkSync(localPath);
+    // Safely delete local file if post creation fails
+    if (localPath) {
+      safelyDeleteFile(localPath);
     }
     console.log(error);
     next(new AppError("Error creating post", 500));
