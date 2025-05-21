@@ -16,15 +16,12 @@ import {
   deleteComment,
 } from "../controllers/commentsController.js";
 import { verifyToken } from "../controllers/verifyJwt.js";
-import multer from "multer";
+import { upload } from "../controllers/multer.js";
 import { validatePost } from "../validators/validateNewpost.js";
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 
 const postRouter = Router();
 
-postRouter.post("/", upload.single("thumbnail"), createPost);
+postRouter.post("/", upload.single("thumbnail"), validatePost, createPost);
 postRouter.get("/", getAllposts);
 postRouter.get("/latest", getLatestPost);
 postRouter.get("/:postid", getPost);
